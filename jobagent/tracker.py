@@ -20,17 +20,28 @@ details summary{cursor:pointer;color:#1F3864}details div{white-space:pre-wrap;ma
 <div class=bar><input id=q placeholder="Search company / title" oninput=draw()>
 <select id=st onchange=draw()><option value="">All statuses</option>__OPTS__</select>
 <select id=va onchange=draw()><option value="">PM + TPM</option><option value=pm>PM</option><option value=tpm>TPM</option></select>
-<select id=ms onchange=draw()><option value=0>Any fit</option><option value=60>Fit 60+</option><option value=75>Fit 75+</option></select></div>
+<select id=ms onchange=draw()><option value=0>Any fit</option><option value=60>Fit 60+</option><option value=75>Fit 75+</option></select>
+<select id=lc onchange=draw()></select></div>
 <table><thead><tr><th>Fit</th><th>Company</th><th>Role</th><th>Location</th><th>Found</th><th>Resume</th><th>Status</th><th>Notes</th></tr></thead><tbody id=tb></tbody></table>
 <script>
 const STATUSES=__STATUSES__;let JOBS=[];
-async function load(){JOBS=await (await fetch('/api/jobs')).json();draw()}
+// City filter: one entry per city, matching the spellings portals use
+const CITIES={'Bengaluru':['bengaluru','bangalore'],'Hyderabad':['hyderabad'],'Pune':['pune'],'Chennai':['chennai'],
+ 'Mumbai':['mumbai'],'Delhi NCR':['gurugram','gurgaon','noida','delhi'],'Kolkata':['kolkata'],'Ahmedabad':['ahmedabad'],
+ 'Jaipur':['jaipur'],'Remote':['remote']};
+function inCity(j,c){const l=(j.location||'').toLowerCase();
+ if(c=='_other')return !Object.values(CITIES).flat().some(a=>l.includes(a));return CITIES[c].some(a=>l.includes(a))}
+function cityOpts(){const el=document.getElementById('lc'),cur=el.value;
+ el.innerHTML='<option value="">All locations</option>'+Object.keys(CITIES).concat('_other').map(c=>{
+  const n=JOBS.filter(j=>inCity(j,c)).length;return n?`<option value="${c}">${c=='_other'?'Other / India unspecified':c} (${n})</option>`:''}).join('');
+ el.value=cur}
+async function load(){JOBS=await (await fetch('/api/jobs')).json();cityOpts();draw()}
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function draw(){const q=document.getElementById('q').value.toLowerCase(),st=document.getElementById('st').value,
- va=document.getElementById('va').value,ms=+document.getElementById('ms').value;
+ va=document.getElementById('va').value,ms=+document.getElementById('ms').value,lc=document.getElementById('lc').value;
  const c={};JOBS.forEach(j=>c[j.status]=(c[j.status]||0)+1);
  document.getElementById('counts').innerHTML=Object.entries(c).map(([k,v])=>`<span class=pill>${k}: ${v}</span>`).join(' ');
- document.getElementById('tb').innerHTML=JOBS.filter(j=>(!q||(j.company+' '+j.title).toLowerCase().includes(q))&&(!st||j.status==st)&&(!va||j.variant==va)&&j.score>=ms)
+ document.getElementById('tb').innerHTML=JOBS.filter(j=>(!q||(j.company+' '+j.title).toLowerCase().includes(q))&&(!st||j.status==st)&&(!va||j.variant==va)&&j.score>=ms&&(!lc||inCity(j,lc)))
  .map(j=>{const cls=j.score>=75?'hi':j.score>=60?'mid':'lo';const miss=JSON.parse(j.missing||'[]');
  return `<tr><td class="score ${cls}">${j.score}</td><td><b>${esc(j.company)}</b></td>
  <td><a href="${esc(j.url)}" target=_blank>${esc(j.title)}</a><details><summary>JD</summary><div>${esc(j.description)}</div></details>
