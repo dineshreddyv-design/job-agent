@@ -1,0 +1,12 @@
+# Secrets and local data: never commit
+config.toml
+jobs.db
+jobs.db-*
+output/
+agent.log
+
+# Personal resumes (keep local only)
+resumes/
+
+__pycache__/
+*.pyc

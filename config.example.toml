@@ -1,0 +1,36 @@
+# Copy to config.toml and fill in. config.toml holds secrets: never commit it to GitHub.
+db = "jobs.db"
+tracker_port = 8765
+tracker_url = "http://localhost:8765"
+
+[search]
+queries = ["product manager", "product owner", "technical program manager", "program manager",
+           "project manager", "delivery manager"]
+parallel = 6
+tailor_min_score = 60        # only tailor resumes for roles scoring this or higher
+tailor_max_per_day = 15      # best-fit roles first; the rest use your base PM/TPM resume
+
+[profile]                    # standard answers for application forms (used by the apply step, next phase)
+current_ctc_lpa = 0          # your current CTC in lakhs
+expected_ctc_lpa = 0         # your expected CTC in lakhs
+notice_period = "90 days"
+locations = "Anywhere in India; onsite, hybrid or remote"
+email = "you@gmail.com"
+phone = "+91 9XXXXXXXXX"
+
+[anthropic]
+api_key = ""                 # leave blank: tailoring runs through Claude Code on your Claude plan (no extra cost)
+model = "claude-sonnet-5-5"
+
+[email]
+gmail_user = "you@gmail.com"
+gmail_app_password = ""      # Google Account > Security > 2-Step Verification > App passwords
+to = "you@gmail.com"
+
+[whatsapp]
+provider = "callmebot"       # or "twilio"
+phone = "+919XXXXXXXXX"
+callmebot_apikey = ""        # see README: one WhatsApp message to CallMeBot gives you this key
+twilio_sid = ""
+twilio_token = ""
+twilio_from = ""

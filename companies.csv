@@ -1,0 +1,65 @@
+company,careers_url,notes
+JPMorgan Chase,https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001,Oracle
+Wells Fargo,https://wf.wd1.myworkdayjobs.com/WellsFargoJobs,Workday
+Citi,https://citi.wd5.myworkdayjobs.com/2,Workday
+Morgan Stanley,https://ms.wd5.myworkdayjobs.com/External,Workday
+State Street,https://statestreet.wd1.myworkdayjobs.com/Global,Workday
+Fidelity Investments,https://fmr.wd1.myworkdayjobs.com/FidelityCareers,Workday
+Vanguard,https://vanguard.wd5.myworkdayjobs.com/vanguard_external,Workday
+Deutsche Bank,https://db.wd3.myworkdayjobs.com/DBWebsite,Workday
+Barclays,https://barclays.wd3.myworkdayjobs.com/External_Career_Site_Barclays,Workday
+Synchrony,https://synchronyfinancial.wd5.myworkdayjobs.com/careers,Workday
+Fiserv,https://fiserv.wd5.myworkdayjobs.com/EXT,Workday
+Mastercard,https://mastercard.wd1.myworkdayjobs.com/CorporateCareers,Workday
+PayPal,https://paypal.wd1.myworkdayjobs.com/jobs,Workday
+Visa,https://visa.wd5.myworkdayjobs.com/Visa,Workday (moved off SmartRecruiters)
+S&P Global,https://spgi.wd5.myworkdayjobs.com/SPGI_Careers,Workday
+LSEG,https://lseg.wd3.myworkdayjobs.com/Careers,Workday
+Thomson Reuters,https://thomsonreuters.wd5.myworkdayjobs.com/External_Career_Site,Workday
+Walmart Global Tech,https://walmart.wd504.myworkdayjobs.com/WalmartExternal,Workday
+Target,https://target.wd5.myworkdayjobs.com/targetcareers,Workday
+Lowe's,https://lowes.wd5.myworkdayjobs.com/LWS_External_CS,Workday
+Expedia,https://expedia.wd108.myworkdayjobs.com/search,Workday
+Salesforce,https://salesforce.wd12.myworkdayjobs.com/External_Career_Site,Workday
+Workday,https://workday.wd5.myworkdayjobs.com/Workday,Workday
+Adobe,https://adobe.wd5.myworkdayjobs.com/external_experienced,Workday
+Autodesk,https://autodesk.wd1.myworkdayjobs.com/Ext,Workday
+NVIDIA,https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite,Workday
+Intel,https://intel.wd1.myworkdayjobs.com/External,Workday
+Dell Technologies,https://enterpriseplatform.dell.com/hcmUI/CandidateExperience/en/sites/careers,Oracle (custom domain)
+HP,https://hp.wd5.myworkdayjobs.com/ExternalCareerSite,Workday
+Micron,https://micron.wd1.myworkdayjobs.com/External,Workday
+Qualcomm,,UNSUPPORTED (Eightfold); was https://qualcomm.wd5.myworkdayjobs.com/External
+Broadcom,https://broadcom.wd1.myworkdayjobs.com/External_Career,Workday
+ServiceNow,https://jobs.smartrecruiters.com/ServiceNow,SmartRecruiters
+Bosch,https://jobs.smartrecruiters.com/BoschGroup,SmartRecruiters
+Novartis,https://novartis.wd3.myworkdayjobs.com/Novartis_Careers,Workday
+AstraZeneca,https://astrazeneca.wd3.myworkdayjobs.com/Careers,Workday
+Bristol Myers Squibb,https://bristolmyerssquibb.wd5.myworkdayjobs.com/BMS,Workday
+Chevron,https://chevron.wd5.myworkdayjobs.com/jobs,Workday
+Amazon,https://www.amazon.jobs,Amazon
+Databricks,https://boards.greenhouse.io/databricks,Greenhouse
+Okta,https://boards.greenhouse.io/okta,Greenhouse
+Twilio,https://boards.greenhouse.io/twilio,Greenhouse
+Rubrik,https://boards.greenhouse.io/rubrik,Greenhouse
+Stripe,https://boards.greenhouse.io/stripe,Greenhouse
+Deloitte India,,UNSUPPORTED (own portal usijobs.deloitte.com); was https://www2.deloitte.com/in/en/careers.html
+Accenture,https://www.accenture.com/in-en/careers,auto-detect
+HSBC,,UNSUPPORTED (SuccessFactors/Eightfold); was https://www.hsbc.com/careers
+Standard Chartered,,UNSUPPORTED (SuccessFactors); was https://jobs.sc.com
+UBS,,"UNSUPPORTED (own portal, blocks automated access); was https://www.ubs.com/global/en/careers.html"
+Goldman Sachs,,UNSUPPORTED (own portal); was https://higher.gs.com
+American Express,,UNSUPPORTED (Eightfold); was https://www.americanexpress.com/en-us/careers/
+BNY,https://www.bny.com/corporate/global/en/careers.html,auto-detect
+Northern Trust,https://careers.northerntrust.com,auto-detect
+Bank of America,https://ghr.wd1.myworkdayjobs.com/Lateral-US,Workday
+Optum (UnitedHealth Group),,UNSUPPORTED (Taleo); was https://careers.unitedhealthgroup.com
+Elevance Health (Carelon),https://careers.elevancehealth.com,auto-detect
+MetLife,,UNSUPPORTED (Avature); was https://www.metlife.com/careers/
+Lloyds Technology Centre,https://www.lloydsbankinggroup.com/careers.html,auto-detect
+Charles Schwab,,UNSUPPORTED (iCIMS); was https://www.schwabjobs.com
+FIS,https://careers.fisglobal.com,auto-detect
+Microsoft,,UNSUPPORTED (Eightfold); was https://careers.microsoft.com
+Google,,UNSUPPORTED (own portal); was https://careers.google.com
+Uber,https://www.uber.com/in/en/careers/,auto-detect
+Oracle,https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_45001,Oracle
