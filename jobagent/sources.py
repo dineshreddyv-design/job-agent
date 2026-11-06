@@ -29,8 +29,17 @@ def _get(url, data=None, headers=None, timeout=25):
         data = json.dumps(data).encode()
     h.update(headers or {})
     req = urllib.request.Request(url, data=data, headers=h)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        body = r.read().decode("utf-8", "replace")
+    for attempt in range(3):  # portals drop connections now and then; retry those, not HTTP errors
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                body = r.read().decode("utf-8", "replace")
+            break
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt == 2:
+                raise
+            time.sleep(5 * (attempt + 1))
     return json.loads(body) if body.strip().startswith(("{", "[")) else body
 
 
