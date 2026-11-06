@@ -2,8 +2,9 @@
 
   scan      check every company's careers portal, store new matching roles
   tailor    make tailored resumes for new roles at or above the fit threshold
+  apply     apply automatically to top roles ([apply] in config.toml); apply <source_id> for one role
   digest    send the daily email + WhatsApp summary
-  daily     scan + tailor + digest (what the scheduler runs)
+  daily     scan + tailor + apply + digest (what the scheduler runs)
   tracker   open the status tracker at http://localhost:8765
   status    update a role from the terminal: status <source_id> <status> [note]
   health    list companies whose portal could not be read (fix their URL in companies.csv)
@@ -124,8 +125,12 @@ def main():
         tailor_new(cfg, store)
     elif cmd == "digest":
         digest(cfg, store)
+    elif cmd == "apply":
+        from . import apply
+        apply.run(cfg, store, sys.argv[2] if len(sys.argv) > 2 else None)
     elif cmd == "daily":
-        for step in (scan, tailor_new, digest):
+        from . import apply
+        for step in (scan, tailor_new, apply.run, digest):
             try:
                 step(cfg, store)
             except Exception:

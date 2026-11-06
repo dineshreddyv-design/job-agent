@@ -27,6 +27,10 @@ class Store:
         self.db = sqlite3.connect(path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.db.executescript(SCHEMA)
+        cols = [r[1] for r in self.db.execute("PRAGMA table_info(jobs)")]
+        if "apply_attempts" not in cols:  # added for the auto-apply step
+            self.db.execute("ALTER TABLE jobs ADD COLUMN apply_attempts INTEGER DEFAULT 0")
+            self.db.commit()
 
     def exists(self, source_id):
         return self.db.execute("SELECT 1 FROM jobs WHERE source_id=?", (source_id,)).fetchone() is not None

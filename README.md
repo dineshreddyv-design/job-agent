@@ -25,7 +25,8 @@ new → ready → applied → screening → interview → final round → offer 
 ## Commands
 | Command | What it does |
 |---|---|
-| `python -m jobagent daily` | scan + tailor + digest |
+| `python -m jobagent daily` | scan + tailor + apply + digest |
+| `python -m jobagent apply` | apply automatically to the top roles (limits in `[apply]`) |
 | `python -m jobagent scan` | look for new roles only |
 | `python -m jobagent tailor` | tailor resumes for new roles scoring 60+ |
 | `python -m jobagent digest` | send the email and WhatsApp summary now |

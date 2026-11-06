@@ -48,7 +48,9 @@ def numbers(s):
 
 def unsupported_numbers(tailored, master_variant, master_all):
     allowed = numbers(json.dumps(master_all))
-    return sorted(numbers(json.dumps({k: v for k, v in tailored.items() if k != "jd_keywords_not_supported"})) - allowed)
+    harmless = {"0"}  # e.g. "0-to-1 products": not a claim about the candidate
+    return sorted(numbers(json.dumps({k: v for k, v in tailored.items() if k != "jd_keywords_not_supported"}))
+                  - allowed - harmless)
 
 
 def tailor(job, master, variant, api_key, model=MODEL):

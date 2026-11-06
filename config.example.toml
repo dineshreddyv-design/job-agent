@@ -17,6 +17,20 @@ notice_period = "90 days"
 locations = "Anywhere in India; onsite, hybrid or remote"
 email = "you@gmail.com"
 phone = "+91 9XXXXXXXXX"
+work_authorization = "Indian citizen; authorized to work in India; no visa sponsorship needed"
+disability = "No"
+willing_to_travel = "Yes"
+willing_to_relocate = "Yes, any location"
+gender = ""                  # used if a form asks
+
+[apply]                      # automatic applications (python -m jobagent apply; also part of daily)
+enabled = true
+min_score = 75               # apply to roles at or above this fit score, best fit first
+max_per_day = 20
+max_per_company = 3          # at most this many applications to one company ...
+company_window_days = 30     # ... within this many days
+submit = true                # false = fill everything but stop before the final Submit
+headless = false             # true = no visible browser window
 
 [anthropic]
 api_key = ""                 # leave blank: tailoring runs through Claude Code on your Claude plan (no extra cost)
