@@ -86,6 +86,9 @@ Rules:
 - After filling a page, click its Next / Continue / Save and Continue / Review / Submit button.
 - SUBMIT_ALLOWED=__SUBMIT__. If false, stop at the final review page with status "ready_to_submit".
 - If the page shows validation errors, fix them. If an action failed, try a different element.
+- If the page says the candidate has ALREADY APPLIED to this job (e.g. "You've already applied for this job",
+  "application already submitted", or it is listed under My Applications), stop at once with status
+  "already_applied": do not fill or submit anything.
 - status "submitted" ONLY when the page confirms the application was received/submitted.
   status "blocked" if there is a CAPTCHA, the job is closed/unavailable, a page truly cannot be completed,
   or the site requires something you cannot provide. Give the reason.
@@ -100,7 +103,7 @@ Actions (JSON objects):
  {"do":"email_code"}                            waits for the site's verification email; result gives the code, or the link is opened
  {"do":"goto","url":"..."}
  {"do":"wait"}
-Return JSON only: {"actions":[...], "status":"continue"|"submitted"|"ready_to_submit"|"blocked", "reason":"short"}"""
+Return JSON only: {"actions":[...], "status":"continue"|"submitted"|"ready_to_submit"|"blocked"|"already_applied", "reason":"short"}"""
 
 
 # ---------------------------------------------------------------- passwords (Windows Credential Manager)
@@ -387,6 +390,8 @@ def apply_one(ctx, job, resume, cfg, master, call, logf):
         history.append({"step": step, "status": plan.get("status"), "reason": plan.get("reason", ""), "actions": results})
         logf.write(json.dumps(results)[:3000] + "\n")
         st = plan.get("status", "continue")
+        if st == "already_applied":
+            return st, plan.get("reason", "")
         if st in ("submitted", "blocked", "ready_to_submit") and not any(r.get("do") == "click" for r in results[-1:]):
             return st, plan.get("reason", "")
         if st in ("submitted", "blocked", "ready_to_submit"):
@@ -472,7 +477,8 @@ def run(cfg, store, only=None):
     if not acfg.get("enabled", False):
         print("Apply step is off ([apply] enabled = false)."); return
     master = json.load(open("resumes/master.json", encoding="utf-8"))
-    jobs = [j for j in store.jobs() if j["source_id"] == only] if only else pick_jobs(store, acfg, master, call_claude_code)
+    jobs = ([j for j in store.jobs() if j["source_id"] == only and j["status"] in ("new", "ready")] if only
+            else pick_jobs(store, acfg, master, call_claude_code))
     if not jobs:
         print("Nothing to apply to (daily or per-company limit reached, or no roles above the score)."); return
     print(f"Applying to {len(jobs)} roles...")
@@ -513,6 +519,9 @@ def run(cfg, store, only=None):
                 pass
             if st == "submitted":
                 store.set_status(j["source_id"], "applied", f"auto-applied (log: {logpath}.txt)")
+            elif st == "already_applied":  # applied earlier, outside the agent: record it, don't count it as today's
+                store.set_status(j["source_id"], "applied", f"portal says already applied: {reason}")
+                store.db.execute("UPDATE jobs SET applied_on=NULL WHERE source_id=?", (j["source_id"],)); store.db.commit()
             else:
                 store.db.execute("UPDATE jobs SET apply_attempts = COALESCE(apply_attempts,0) + 1 WHERE source_id=?",
                                  (j["source_id"],)); store.db.commit()
