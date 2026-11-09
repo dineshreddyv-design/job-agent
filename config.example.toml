@@ -27,6 +27,7 @@ gender = ""                  # used if a form asks
 enabled = true
 min_score = 75               # apply to roles at or above this fit score, best fit first
 max_per_day = 10           # only the best-suited roles: Claude rates each role once for aptness
+exclude_companies = []   # never auto-apply here (e.g. your current employer)
 min_ai_fit = 70            # skip roles Claude rates below this, even if that means fewer than max_per_day
 max_per_company = 3          # at most this many applications to one company ...
 company_window_days = 30     # ... within this many days

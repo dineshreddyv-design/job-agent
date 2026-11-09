@@ -442,6 +442,8 @@ def pick_jobs(store, acfg, master=None, call=None):
         "SELECT company, COUNT(*) FROM jobs WHERE applied_on >= ? GROUP BY company", (since,))}
     cands = store.jobs("status IN ('new','ready') AND score >= ? AND COALESCE(apply_attempts,0) < ?",
                        (acfg.get("min_score", 75), MAX_ATTEMPTS))
+    skip = {c.lower() for c in acfg.get("exclude_companies", [])}  # e.g. your current employer
+    cands = [j for j in cands if j["company"].lower() not in skip]
     cands.sort(key=lambda j: (-j["score"], j["resume_file"] is None))
     if room and master and call:
         # Keyword score saturates at 100, so Claude rates every candidate once for aptness (cached in ai_fit).
@@ -456,6 +458,8 @@ def pick_jobs(store, acfg, master=None, call=None):
             break
         if per_co.get(j["company"], 0) >= acfg.get("max_per_company", 3):
             continue
+        if any(o["company"] == j["company"] and o["title"] == j["title"] for o in out):
+            continue  # same posting listed under two requisition numbers
         per_co[j["company"]] = per_co.get(j["company"], 0) + 1
         out.append(j)
     return out
