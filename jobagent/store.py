@@ -31,6 +31,10 @@ class Store:
         if "apply_attempts" not in cols:  # added for the auto-apply step
             self.db.execute("ALTER TABLE jobs ADD COLUMN apply_attempts INTEGER DEFAULT 0")
             self.db.commit()
+        if "ai_fit" not in cols:  # Claude's 0-100 judgement of how apt the candidate is; picks the daily applies
+            self.db.execute("ALTER TABLE jobs ADD COLUMN ai_fit INTEGER")
+            self.db.execute("ALTER TABLE jobs ADD COLUMN ai_reason TEXT")
+            self.db.commit()
 
     def exists(self, source_id):
         return self.db.execute("SELECT 1 FROM jobs WHERE source_id=?", (source_id,)).fetchone() is not None

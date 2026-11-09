@@ -400,16 +400,56 @@ def apply_one(ctx, job, resume, cfg, master, call, logf):
     return "blocked", "ran out of steps"
 
 
-def pick_jobs(store, acfg):
+RANK_PROMPT = """You are a senior recruiter. Rate how apt the candidate below is for each role: how likely a hiring
+manager would shortlist him. Weigh: seniority match (19+ years; titles like Senior/Principal/Staff PM, Senior/Lead TPM,
+Delivery Lead fit; very junior or VP/Director-only roles fit poorly), domain (BFSI, lending, cards, payments, data
+platforms, cloud migration, AI products are strong), required skills he truly lacks (e.g. deep hardware, consumer
+growth, specific tech he never used), and location (Hyderabad best, then other Indian cities).
+Be discriminating: spread scores across 0-100; only a few roles should score above 85.
+Return JSON only: {"ratings":[{"id":"<id>","fit":0-100,"why":"<=15 words"}]}"""
+
+
+def rank(store, jobs, master, call):
+    """Have Claude rate unrated roles for aptness; results are kept in jobs.ai_fit / ai_reason."""
+    todo = [j for j in jobs if j.get("ai_fit") is None]
+    for i in range(0, len(todo), 20):
+        chunk = todo[i:i + 20]
+        cand = {"headline_pm": master["pm"]["headline"], "headline_tpm": master["tpm"]["headline"],
+                "summary": master["pm"]["summary"], "competencies": master["pm"].get("competencies"),
+                "history": [(x["title"], x["company"], x["dates"]) for x in master["pm"]["jobs"]],
+                "certifications": master["certifications"], "base": "Hyderabad, India"}
+        roles = [{"id": j["source_id"], "title": j["title"], "company": j["company"], "location": j["location"],
+                  "jd": re.sub(r"\s+", " ", j["description"] or "")[:1500]} for j in chunk]
+        try:
+            res = call(RANK_PROMPT, f"CANDIDATE: {json.dumps(cand)}\n\nROLES: {json.dumps(roles)}")
+        except Exception as e:
+            print(f"  (ranking failed, falling back to keyword score: {e})"); return
+        for r in res.get("ratings", []):
+            store.db.execute("UPDATE jobs SET ai_fit=?, ai_reason=? WHERE source_id=?",
+                             (int(r.get("fit", 0)), str(r.get("why", ""))[:200], str(r.get("id"))))
+        store.db.commit()
+        for j in chunk:
+            row = store.db.execute("SELECT ai_fit, ai_reason FROM jobs WHERE source_id=?", (j["source_id"],)).fetchone()
+            j["ai_fit"], j["ai_reason"] = row[0], row[1]
+
+
+def pick_jobs(store, acfg, master=None, call=None):
     today = datetime.date.today()
     applied_today = store.db.execute("SELECT COUNT(*) FROM jobs WHERE applied_on = ?", (today.isoformat(),)).fetchone()[0]
-    room = max(0, acfg.get("max_per_day", 20) - applied_today)
+    room = max(0, acfg.get("max_per_day", 10) - applied_today)
     since = (today - datetime.timedelta(days=acfg.get("company_window_days", 30))).isoformat()
     per_co = {r[0]: r[1] for r in store.db.execute(
         "SELECT company, COUNT(*) FROM jobs WHERE applied_on >= ? GROUP BY company", (since,))}
     cands = store.jobs("status IN ('new','ready') AND score >= ? AND COALESCE(apply_attempts,0) < ?",
                        (acfg.get("min_score", 75), MAX_ATTEMPTS))
     cands.sort(key=lambda j: (-j["score"], j["resume_file"] is None))
+    if room and master and call:
+        # Keyword score saturates at 100, so Claude rates every candidate once for aptness (cached in ai_fit).
+        rank(store, cands, master, call)
+        floor = acfg.get("min_ai_fit", 70)
+        rated = [j for j in cands if j.get("ai_fit") is not None]
+        if rated:
+            cands = sorted((j for j in rated if j["ai_fit"] >= floor), key=lambda j: (-j["ai_fit"], -j["score"]))
     out = []
     for j in cands:
         if len(out) >= room:
@@ -428,10 +468,13 @@ def run(cfg, store, only=None):
     if not acfg.get("enabled", False):
         print("Apply step is off ([apply] enabled = false)."); return
     master = json.load(open("resumes/master.json", encoding="utf-8"))
-    jobs = [j for j in store.jobs() if j["source_id"] == only] if only else pick_jobs(store, acfg)
+    jobs = [j for j in store.jobs() if j["source_id"] == only] if only else pick_jobs(store, acfg, master, call_claude_code)
     if not jobs:
         print("Nothing to apply to (daily or per-company limit reached, or no roles above the score)."); return
     print(f"Applying to {len(jobs)} roles...")
+    for j in jobs:
+        if j.get("ai_fit") is not None:
+            print(f"  [{j['ai_fit']}] {j['company']}: {j['title']} - {j.get('ai_reason') or ''}")
     os.makedirs("output/apply_logs", exist_ok=True)
     with sync_playwright() as pw:
         kw = dict(headless=acfg.get("headless", False), accept_downloads=False, viewport={"width": 1366, "height": 900})
